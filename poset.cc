@@ -1,6 +1,6 @@
-/* Drugie zadanie z Jêzyków i narzêdzi programowania I 19/20
+/* Drugie zadanie z JÄ™zykÃ³w i narzÄ™dzi programowania I 19/20
  * 2019-10-31
- * Adam Rozenek i Andrzej Ma³ek
+ * Adam Rozenek i Andrzej MaÅ‚ek
  */
 
 #include <map>
