@@ -19,15 +19,15 @@ namespace jnp1
 {
     using id_graph = unsigned int;
     using graph = std::unordered_map<id_graph, std::unordered_set<id_graph>>;
-    using dictionary = std::unordered_map<string, id_graph>;
+    using dictionary = std::unordered_map<std::string, id_graph>;
     using id_poset = unsigned long;
 
-    std::unorder_map<id_poset, dictionary> dictionary_map;
-    std::unorder_map<id_poset, id_graph> next_id_graph;
-    std::unorder_map<id_poset, graph> graph_map;
+    std::unordered_map<id_poset, dictionary> dictionary_map;
+    std::unordered_map<id_poset, id_graph> next_id_graph;
+    std::unordered_map<id_poset, graph> graph_map;
     unsigned long new_poset_id = 0;
 
-    namespace sup_func
+    namespace sup
     {
         /*      Funkcja badająca czy element value1 poprzedza element value2 w posecie o identyfikatorze id. Zakłada,
          *      że taki poset istnieje, i że elementy value1 i value2 do niego należą. Nie zakłada, że value1 nie jest
@@ -49,30 +49,30 @@ namespace jnp1
 
     void poset_delete(unsigned long id) {
         if (debug) {
-            cerr << "poset_delete(" + id + ")\n";
+            std::cerr << "poset_delete(" + std::to_string(id) + ")\n";
         }
         if (dictionary_map.count(id) == 1) {
             dictionary_map.erase(id);
             next_id_graph.erase(id);
             graph_map.erase(id);
             if (debug) {
-                cerr << "poset_delete: poset " + id + " deleted\n";
+                std::cerr << "poset_delete: poset " + std::to_string(id) + " deleted\n";
             }
         } else {
             if (debug) {
-                cerr << "poset_delete: poset " + id + " does not exist\n";
+                std::cerr << "poset_delete: poset " + std::to_string(id) + " does not exist\n";
             }
         }
     }
 
     bool poset_insert(unsigned long id, char const *value) {
         if (value == NULL) {
-            if (debug && dictionary_map.count[id] == 0) {
-                cerr << "poset_insert(" + id + ", \"NULL\")\n"
-                     << "poset_insert: poset " + id + " does not exist\n"
+            if (debug && dictionary_map.count(id) == 0) {
+                std::cerr << "poset_insert(" + std::to_string(id) + ", \"NULL\")\n"
+                     << "poset_insert: poset " + std::to_string(id) + " does not exist\n"
                      << "poset_insert: invalid value (NULL)\n";
             } else if (debug) {
-                cerr << "poset_insert(" + id + ", \"NULL\")\n"
+                std::cerr << "poset_insert(" + std::to_string(id) + ", \"NULL\")\n"
                      << "poset_insert: invalid value (NULL)\n";
             }
 
@@ -81,12 +81,12 @@ namespace jnp1
 
         std::string str_value(value);
         if (debug) {
-            cerr << "poset_insert(" + id + ", \"" + str_value + "\")\n";
+            std::cerr << "poset_insert(" + std::to_string(id) + ", \"" + str_value + "\")\n";
         }
 
-        if (dictionary_map.count[id] == 0) {
+        if (dictionary_map.count(id) == 0) {
             if (debug) {
-                cerr << "poset_insert: poset " + id + " does not exist\n";
+                std::cerr << "poset_insert: poset " + std::to_string(id) + " does not exist\n";
             }
 
             return false;
@@ -94,7 +94,8 @@ namespace jnp1
 
         if (dictionary_map[id].count(str_value) == 1) {
             if (debug) {
-                cerr << "poset_insert: poset " + id + ", element \"" + str_value + "\" already exists\n";
+                std::cerr << "poset_insert: poset " + std::to_string(id) + ", element \"" + str_value +
+                             "\" already exists\n";
             }
 
             return false;
@@ -103,7 +104,7 @@ namespace jnp1
         dictionary_map[id].insert({str_value, next_id_graph[id]});
         (next_id_graph[id])++;
         if (debug) {
-            cerr << "poset_insert: poset " + id + ", element \"" + str_value + "\" inserted\n";
+            std::cerr << "poset_insert: poset " + std::to_string(id) + ", element \"" + str_value + "\" inserted\n";
         }
 
         return true;
@@ -113,19 +114,19 @@ namespace jnp1
         if (value1 == NULL) {
             if (debug) {
                 if (value2 == NULL) {
-                    cerr << "poset_test(" + id + ", \"NULL\", \"NULL\")\n";
+                    std::cerr << "poset_test(" + std::to_string(id) + ", \"NULL\", \"NULL\")\n";
                 } else {
                     std::string str_value2(value2);
-                    cerr << "poset_test(" + id + ", \"NULL\", " + str_value2 + "\")\n";
+                    std::cerr << "poset_test(" + std::to_string(id) + ", \"NULL\", " + str_value2 + "\")\n";
                 }
                 if (dictionary_map.count(id) == 0) {
-                    cerr << "poset_insert: poset " + id + " does not exist\n";
+                    std::cerr << "poset_insert: poset " + std::to_string(id) + " does not exist\n";
                 }
 
-                cerr << "poset test: invalid value1 (NULL)\n";
+                std::cerr << "poset test: invalid value1 (NULL)\n";
 
                 if (value2 == NULL) {
-                    cerr << "poset test: invalid value2 (NULL)\n";
+                    std::cerr << "poset test: invalid value2 (NULL)\n";
                 }
             }
 
@@ -134,28 +135,29 @@ namespace jnp1
             if (debug) {
                 std::string str_value1(value1);
 
-                cerr << "poset_test(" + id + ", \"" + str_value1 + "\", \"NULL\")\n";
+                std::cerr << "poset_test(" + std::to_string(id) + ", \"" + str_value1 + "\", \"NULL\")\n";
 
                 if (dictionary_map.count(id) == 0) {
-                    cerr << "poset_insert: poset " + id + " does not exist\n";
+                    std::cerr << "poset_insert: poset " + std::to_string(id) + " does not exist\n";
                 }
 
-                cerr << "poset test: invalid value2 (NULL)\n";
+                std::cerr << "poset test: invalid value2 (NULL)\n";
             }
 
             return false;
         }
 
         if (debug) {
-            cerr << "poset_test(" + id + ", \"" + str_value1 + "\", \"" + str_value2 + "\")\n";
+            std::string str_value1(value1);
+            std::string str_value2(value2);
+            std::cerr << "poset_test(" + std::to_string(id) + ", \"" + str_value1 + "\", \"" + str_value2 + "\")\n";
         }
 
         if (dictionary_map.count(id) == 0) {
             if (debug) {
                 std::string str_value1(value1);
                 std::string str_value2(value2);
-                cerr << "poset_test(" + id + ", \"" + str_value1 + "\", \"" + str_value2 + "\")\n"
-                     << "poset_insert: poset " + id + " does not exist\n";
+                std::cerr << "poset_insert: poset " + std::to_string(id) + " does not exist\n";
             }
             return false;
         }
@@ -163,14 +165,10 @@ namespace jnp1
         std::string str_value1(value1);
         std::string str_value2(value2);
 
-        if (debug) {
-            cerr << "poset_test(" + id + ", \"" + str_value1 + "\", \"" + str_value2 + "\")\n";
-        }
-
         if (dictionary_map[id].count(str_value1) == 0 || dictionary_map[id].count(str_value2) == 0) {
             if (debug) {
-                cerr << "poset_test: poset " + id + ", element \"" + str_value1 + "\" or \"" + str_value2 +
-                        "\" does not exist\n";
+                std::cerr << "poset_test: poset " + std::to_string(id) + ", element \"" + str_value1 + "\" or \"" +
+                             str_value2 + "\" does not exist\n";
             }
 
             return false;
@@ -178,15 +176,15 @@ namespace jnp1
 
         if (sup::poset_test_main(id, str_value1, str_value2)) {
             if (debug) {
-                cerr << "poset_test: poset " + id + ", relation (\"" + str_value1 + "\", \"" + str_value2 +
-                        "\") exists\n";
+                std::cerr << "poset_test: poset " + std::to_string(id) + ", relation (\"" + str_value1 + "\", \"" +
+                             str_value2 + "\") exists\n";
             }
 
             return true;
         } else {
             if (debug) {
-                cerr << "poset_test: poset " + id + ", relation (\"" + str_value1 + "\", \"" + str_value2 +
-                        "\") does not exist\n";
+                std::cerr << "poset_test: poset " + std::to_string(id) + ", relation (\"" + str_value1 + "\", \"" +
+                             str_value2 + "\") does not exist\n";
 
             }
 
