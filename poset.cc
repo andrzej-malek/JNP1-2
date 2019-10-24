@@ -31,7 +31,7 @@ namespace jnp1
     {
         /*      Funkcja badająca czy element value1 poprzedza element value2 w posecie o identyfikatorze id. Zakłada,
          *      że taki poset istnieje, i że elementy value1 i value2 do niego należą. Nie zakłada, że value1 nie jest
-         *      równe value2.
+         *      równe value2 (zwraca wartość true w takim przypadku).
          *
          *  Parametry :
          *      id     : Identyfikator badanego posetu.
@@ -40,9 +40,52 @@ namespace jnp1
          *  Return :
          *      Wartość true, jeżeli element value1 poprzedza element value2, lub false w przeciwnym przypadku.
          */
-        bool poset_test_main(unsigned long id, std::string& value1, std::string& value2) {
+        bool poset_test_main(unsigned long id, std::string const& value1, std::string const& value2) {
             if (value1.compare(value2)) {
                 return true;
+            }
+        }
+
+        /*      Funkcja wypisująca debugowe informacje dla funkcji o formacie func_name(unsigned long id, char const
+         *      *value1, char const *value2) gdzie poset o podanym identyfikatorze nie istnieje, któryś z elementów ma
+         *      wartość NULL lub któryś z elementów nie należy do posetu o podanym identyfikatorze.
+         *
+         *  Parametry :
+         *      func_name : string zawierający nazwę debugowanej funkcji.
+         *      id        : Argument id debugowanej funkcji.
+         *      value1    : Argument value1 debugowanej funkcji.
+         *      value2    : Argument value2 debugowanej funkcji.
+         *  Return :
+         *      void
+         */
+        void three_arg_debug(std::string const& func_name, unsigned long id, char const *value1, char const *value2) {
+            if (value1 == NULL) {
+                if (value2 == NULL) {
+                    std::cerr << func_name + "(" + std::to_string(id) + ", \"NULL\", \"NULL\")\n";
+                } else {
+                    std::string str_value2(value2);
+                    std::cerr << func_name + "(" + std::to_string(id) + ", \"NULL\", " + str_value2 + ")\n";
+                }
+                if (dictionary_map.count(id) == 0) {
+                    std::cerr << func_name + ": poset " + std::to_string(id) + " does not exist\n";
+                }
+                std::cerr << func_name + ": invalid value1 (NULL)\n";
+                if (value2 == NULL) {
+                    std::cerr << func_name + ": invalid value2 (NULL)\n";
+                }
+            } else if (value2 == NULL) {
+                std::string str_value1(value1);
+                std::cerr << func_name + "(" + std::to_string(id) + ", " + str_value1 + ", \"NULL\")\n";
+                if (dictionary_map.count(id) == 0) {
+                    std::cerr << func_name + ": poset " + std::to_string(id) + " does not exist\n";
+                }
+                std::cerr << func_name + ": invalid value2 (NULL)\n";
+            } else {
+                std::string str_value1(value1);
+                std::string str_value2(value2);
+                std::cerr << func_name + "(" + std::to_string(id) + ", " + str_value1 + ", " + str_value2 + ")\n";
+                std::cerr << func_name + ": poset " + std::to_string(id) + ", element \"" + str_value1 + "\" or \"" +
+                             str_value2 + "\" does not exist\n";
             }
         }
     }
@@ -111,66 +154,20 @@ namespace jnp1
     }
 
     bool poset_test(unsigned long id, char const *value1, char const *value2) {
-        if (value1 == NULL) {
+        if (value1 == NULL || value2 == NULL || dictionary_map.count(id) == 0) {
             if (debug) {
-                if (value2 == NULL) {
-                    std::cerr << "poset_test(" + std::to_string(id) + ", \"NULL\", \"NULL\")\n";
-                } else {
-                    std::string str_value2(value2);
-                    std::cerr << "poset_test(" + std::to_string(id) + ", \"NULL\", " + str_value2 + "\")\n";
-                }
-                if (dictionary_map.count(id) == 0) {
-                    std::cerr << "poset_insert: poset " + std::to_string(id) + " does not exist\n";
-                }
-
-                std::cerr << "poset test: invalid value1 (NULL)\n";
-
-                if (value2 == NULL) {
-                    std::cerr << "poset test: invalid value2 (NULL)\n";
-                }
-            }
-
-            return false;
-        } else if (value2 == NULL) {
-            if (debug) {
-                std::string str_value1(value1);
-
-                std::cerr << "poset_test(" + std::to_string(id) + ", \"" + str_value1 + "\", \"NULL\")\n";
-
-                if (dictionary_map.count(id) == 0) {
-                    std::cerr << "poset_insert: poset " + std::to_string(id) + " does not exist\n";
-                }
-
-                std::cerr << "poset test: invalid value2 (NULL)\n";
-            }
-
-            return false;
-        }
-
-        if (debug) {
-            std::string str_value1(value1);
-            std::string str_value2(value2);
-            std::cerr << "poset_test(" + std::to_string(id) + ", \"" + str_value1 + "\", \"" + str_value2 + "\")\n";
-        }
-
-        if (dictionary_map.count(id) == 0) {
-            if (debug) {
-                std::string str_value1(value1);
-                std::string str_value2(value2);
-                std::cerr << "poset_insert: poset " + std::to_string(id) + " does not exist\n";
+                sup::three_arg_debug("poset_insert", id, value1, value2);
             }
             return false;
         }
-
         std::string str_value1(value1);
         std::string str_value2(value2);
 
         if (dictionary_map[id].count(str_value1) == 0 || dictionary_map[id].count(str_value2) == 0) {
             if (debug) {
-                std::cerr << "poset_test: poset " + std::to_string(id) + ", element \"" + str_value1 + "\" or \"" +
-                             str_value2 + "\" does not exist\n";
+                sup::three_arg_debug("poset_insert", id, value1, value2);
             }
-
+            sup::three_arg_debug("poset_insert", id, value1, value2);
             return false;
         }
 
@@ -179,15 +176,12 @@ namespace jnp1
                 std::cerr << "poset_test: poset " + std::to_string(id) + ", relation (\"" + str_value1 + "\", \"" +
                              str_value2 + "\") exists\n";
             }
-
             return true;
         } else {
             if (debug) {
                 std::cerr << "poset_test: poset " + std::to_string(id) + ", relation (\"" + str_value1 + "\", \"" +
                              str_value2 + "\") does not exist\n";
-
             }
-
             return false;
         }
     }
