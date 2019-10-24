@@ -153,6 +153,42 @@ namespace jnp1
         return true;
     }
 
+    bool poset_add(unsigned long id, char const *value1, char const *value2) {
+        if (value1 == NULL || value2 == NULL || dictionary_map.count(id) == 0) {
+            if (debug) {
+                sup::three_arg_debug("poset_add", id, value1, value2);
+            }
+            return false;
+        }
+        std::string str_value1(value1);
+        std::string str_value2(value2);
+
+        if (dictionary_map[id].count(str_value1) == 0 || dictionary_map[id].count(str_value2) == 0) {
+            if (debug) {
+                sup::three_arg_debug("poset_add", id, value1, value2);
+            }
+            sup::three_arg_debug("poset_add", id, value1, value2);
+            return false;
+        }
+
+        if (sup::poset_test_main(id, str_value1, str_value2) || sup::poset_test_main(id, str_value2, str_value1)) {
+            if (debug) {
+                std::cerr << "poset_add: poset " + std::to_string(id) + ", relation (\"" + str_value1 + "\", \"" +
+                             str_value2 + "\") cannot be added\n";
+            }
+            return false;
+        } else {
+            id_graph value1_id = dictionary_map[id][str_value1];
+            id_graph value2_id = dictionary_map[id][str_value2];
+            graph_map[id][value1_id].insert(value2_id);
+            if (debug) {
+                std::cerr << "poset_add: poset " + std::to_string(id) + ", relation (\"" + str_value1 + "\", \"" +
+                             str_value2 + "\") added\n";
+            }
+            return true;
+        }
+    }
+
     bool poset_test(unsigned long id, char const *value1, char const *value2) {
         if (value1 == NULL || value2 == NULL || dictionary_map.count(id) == 0) {
             if (debug) {
