@@ -15,6 +15,8 @@
 #include <iostream>
 #include <string>
 
+#include "poset.h"
+
 namespace jnp1
 {
     using id_graph = unsigned int;
@@ -44,6 +46,8 @@ namespace jnp1
             if (value1.compare(value2)) {
                 return true;
             }
+
+            return false;
         }
 
         /*      Funkcja wypisująca debugowe informacje dla funkcji o formacie func_name(unsigned long id, char const
@@ -90,6 +94,22 @@ namespace jnp1
         }
     }
 
+    unsigned long poset_new(void) {
+        id_poset added_poset = new_poset_id;
+        new_poset_id++;
+        dictionary empty_dictionary;
+        graph empty_graph;
+        dictionary_map[added_poset] = empty_dictionary;
+        graph_map[added_poset] = empty_graph;
+        next_id_graph[added_poset] = 0;
+
+        if (debug) {
+            std::cerr << "poset_new: ";
+        }
+
+        return added_poset;
+    }
+
     void poset_delete(unsigned long id) {
         if (debug) {
             std::cerr << "poset_delete(" + std::to_string(id) + ")\n";
@@ -106,6 +126,17 @@ namespace jnp1
                 std::cerr << "poset_delete: poset " + std::to_string(id) + " does not exist\n";
             }
         }
+    }
+
+    size_t poset_size(unsigned long id) {
+        if (dictionary_map.find(id) == dictionary_map.end()) {
+            if (debug) {
+                std::cerr << "poset_delete: poset " + std::to_string(id) + " does not exist\n";
+            }
+            return 0;
+        }
+
+        return graph_map[id].size();
     }
 
     bool poset_insert(unsigned long id, char const *value) {
@@ -153,8 +184,42 @@ namespace jnp1
         return true;
     }
 
-    bool poset_add(unsigned long id, char const *value1, char const *value2) {
-        if (value1 == NULL || value2 == NULL || dictionary_map.count(id) == 0) {
+    bool poset_remove(unsigned long id, char const *value) {
+        bool result = true;
+        graph g = graph_map[id];
+        if (value == NULL) {
+            if (debug) {
+                std::cerr << "poset remove: invalid value (NULL)\n";
+            }
+            result &= false;
+        }
+        if (dictionary_map.find(id) == dictionary_map.end()) {
+            if (debug) {
+                std::cerr << "poset_remove: poset " + std::to_string(id) + " does not exist\n";
+            }
+            result &= false;
+        } else if (dictionary_map[id].find(value) == dictionary_map[id].end()) {
+            if (debug) {
+                std::cerr << "poset_remove: \n";
+            }
+        }
+
+        if (!result) return false;
+
+        id_graph node = dictionary_map[id][value];
+
+
+        for (auto item: graph_map[id]) {
+            //std::cout << item.first << ' ' << item.second << '\n';
+            std::cout << "aa\n";
+        }
+        graph_map[id].erase(node);
+        return true;
+    }
+
+
+    bool poset_test2(unsigned long id, char const *value1, char const *value2) {
+        if (value1 == NULL) {
             if (debug) {
                 sup::three_arg_debug("poset_add", id, value1, value2);
             }

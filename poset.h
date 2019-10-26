@@ -3,8 +3,8 @@
  * Adam Rozenek i Andrzej Małek
  */
 
-#ifndef POSET.H
-#define POSET.H
+#ifndef POSET_H
+#define POSET_H
 
 #ifndef __cplusplus
 #include <stdbool.h>
@@ -112,4 +112,4 @@ namespace jnp1
 #endif
 
 
-#endif /* POSET.H */
+#endif /* POSET_H */
