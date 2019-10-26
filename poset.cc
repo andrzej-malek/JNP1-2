@@ -62,7 +62,7 @@ namespace jnp1
          *  Return :
          *      void
          */
-        void three_arg_debug(std::string const& func_name, unsigned long id, char const *value1, char const *value2) {
+        bool three_arg_debug(std::string const& func_name, unsigned long id, char const *value1, char const *value2) {
             if (value1 == NULL) {
                 if (value2 == NULL) {
                     std::cerr << func_name + "(" + std::to_string(id) + ", \"NULL\", \"NULL\")\n";
@@ -77,6 +77,7 @@ namespace jnp1
                 if (value2 == NULL) {
                     std::cerr << func_name + ": invalid value2 (NULL)\n";
                 }
+                return false;
             } else if (value2 == NULL) {
                 std::string str_value1(value1);
                 std::cerr << func_name + "(" + std::to_string(id) + ", " + str_value1 + ", \"NULL\")\n";
@@ -84,13 +85,16 @@ namespace jnp1
                     std::cerr << func_name + ": poset " + std::to_string(id) + " does not exist\n";
                 }
                 std::cerr << func_name + ": invalid value2 (NULL)\n";
+                return false;
             } else {
                 std::string str_value1(value1);
                 std::string str_value2(value2);
                 std::cerr << func_name + "(" + std::to_string(id) + ", " + str_value1 + ", " + str_value2 + ")\n";
                 std::cerr << func_name + ": poset " + std::to_string(id) + ", element \"" + str_value1 + "\" or \"" +
                              str_value2 + "\" does not exist\n";
+                return false;
             }
+            return true;
         }
     }
 
@@ -193,25 +197,22 @@ namespace jnp1
             }
             result &= false;
         }
+        std::string str_value(value);
         if (dictionary_map.find(id) == dictionary_map.end()) {
             if (debug) {
                 std::cerr << "poset_remove: poset " + std::to_string(id) + " does not exist\n";
             }
             result &= false;
-        } else if (dictionary_map[id].find(value) == dictionary_map[id].end()) {
+        } else if (dictionary_map[id].find(str_value) == dictionary_map[id].end()) {
             if (debug) {
                 std::cerr << "poset_remove: \n";
             }
         }
-
         if (!result) return false;
 
-        id_graph node = dictionary_map[id][value];
-
-
-        for (auto item: graph_map[id]) {
-            //std::cout << item.first << ' ' << item.second << '\n';
-            std::cout << "aa\n";
+        id_graph node = dictionary_map[id][str_value];
+        for (auto iter = graph_map[id].begin(); iter != graph_map[id].end(); iter++) {
+            (iter -> second).erase(node);
         }
         graph_map[id].erase(node);
         return true;
@@ -254,6 +255,38 @@ namespace jnp1
         }
     }
 
+    bool poset_del(unsigned long id, char const *value1, char const *value2) {
+        if (!sup::three_arg_debug("poset_del", id, value1, value2)) {
+            return false;
+        }
+        std::string str_value1(value1);
+        std::string str_value2(value2);
+        bool result = true;
+        if (dictionary_map[id].find(str_value1) == dictionary_map[id].end()) {
+            if (debug) {
+                std::cerr << "poset_del";
+            }
+            result &= false;
+        }
+        if (dictionary_map[id].find(str_value2) == dictionary_map[id].end()) {
+            if (debug) {
+                std::cerr << "poset_del";
+            }
+            result &= false;
+        }
+        if (!result) {
+            return false;
+        }
+        id_graph node_val1 = dictionary_map[id][value1];
+        id_graph node_val2 = dictionary_map[id][value2];
+        if (sup::poset_test_main(id, str_value1, str_value2)) {
+            graph_map[id][node_val2].erase(node_val2);
+        } else {
+            return false;
+        }
+        return true;
+    }
+
     bool poset_test(unsigned long id, char const *value1, char const *value2) {
         if (value1 == NULL || value2 == NULL || dictionary_map.count(id) == 0) {
             if (debug) {
@@ -285,5 +318,15 @@ namespace jnp1
             }
             return false;
         }
+    }
+
+    void poset_clear(unsigned long id) {
+        dictionary_map.erase(id);
+        next_id_graph.erase(id);
+        dictionary_map[id].clear();
+        for (auto iter = graph_map[id].begin(); iter != graph_map[id].end(); iter++) {
+            (iter -> second).clear();
+        }
+        graph_map[id].clear();
     }
 }
