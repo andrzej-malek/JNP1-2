@@ -29,8 +29,7 @@ namespace jnp1
     std::unordered_map<id_poset, graph> graph_map;
     unsigned long new_poset_id = 0;
 
-    namespace sup
-    {
+    namespace sup {
         /*      Funkcja badająca czy element value1 poprzedza element value2 w posecie o identyfikatorze id. Zakłada,
          *      że taki poset istnieje, i że elementy value1 i value2 do niego należą. Nie zakłada, że value1 nie jest
          *      równe value2 (zwraca wartość true w takim przypadku).
@@ -42,7 +41,7 @@ namespace jnp1
          *  Return :
          *      Wartość true, jeżeli element value1 poprzedza element value2, lub false w przeciwnym przypadku.
          */
-        bool poset_test_main(unsigned long id, std::string const& value1, std::string const& value2) {
+        bool poset_test_main(unsigned long id, std::string const &value1, std::string const &value2) {
             if (value1.compare(value2)) {
                 return true;
             }
@@ -62,7 +61,7 @@ namespace jnp1
          *  Return :
          *      void
          */
-        bool three_arg_debug(std::string const& func_name, unsigned long id, char const *value1, char const *value2) {
+        void three_arg_debug(std::string const &func_name, unsigned long id, char const *value1, char const *value2) {
             if (value1 == NULL) {
                 if (value2 == NULL) {
                     std::cerr << func_name + "(" + std::to_string(id) + ", \"NULL\", \"NULL\")\n";
@@ -77,7 +76,6 @@ namespace jnp1
                 if (value2 == NULL) {
                     std::cerr << func_name + ": invalid value2 (NULL)\n";
                 }
-                return false;
             } else if (value2 == NULL) {
                 std::string str_value1(value1);
                 std::cerr << func_name + "(" + std::to_string(id) + ", " + str_value1 + ", \"NULL\")\n";
@@ -85,16 +83,67 @@ namespace jnp1
                     std::cerr << func_name + ": poset " + std::to_string(id) + " does not exist\n";
                 }
                 std::cerr << func_name + ": invalid value2 (NULL)\n";
-                return false;
             } else {
                 std::string str_value1(value1);
                 std::string str_value2(value2);
                 std::cerr << func_name + "(" + std::to_string(id) + ", " + str_value1 + ", " + str_value2 + ")\n";
                 std::cerr << func_name + ": poset " + std::to_string(id) + ", element \"" + str_value1 + "\" or \"" +
                              str_value2 + "\" does not exist\n";
+            }
+
+        }
+
+        /* Funkcja weryfikująca podane parametry
+         * Sprawdza, czy istnieje poset o danym id, czy zmienne value nie są nullami, czy istnieją w posecie
+         * elementy o identyfikatorach równych zmiennym value1/value2 oraz wypisuje stosowne informacje na wyjście
+         * diagnostyczne
+         *
+         * Parametry :
+         *      func_name : string zawierający nazwę debugowanej funkcji.
+         *      id        : Argument id debugowanej funkcji.
+         *      value1    : Argument value1 debugowanej funkcji.
+         *      value2    : Argument value2 debugowanej funkcji.
+         *  Return :
+         *      true - jeżeli dane są podane w poprawnym formacie i są dostępne w posecie
+         *      false - w przeciwnym wypadku
+         */
+        bool verify_three_args(std::string const &func_name, unsigned long id, char const *value1, char const *value2) {
+            bool result = true;
+            if (dictionary_map.find(id) == dictionary_map.end()) {
+                if (debug) {
+                    std::cerr << func_name << ": poset " + std::to_string(id) + " does not exist\n";
+                    result = false;
+                } else {
+                    return false;
+                }
+            }
+            if (value1 == NULL) {
+                if (debug) {
+                    std::cerr << func_name + ": invalid value1 (NULL)\n";
+                    result = false;
+                } else {
+                    return false;
+                }
+            }
+            if (value2 == NULL) {
+                if (debug) {
+                    std::cerr << func_name + ": invalid value2 (NULL)\n";
+                    result = false;
+                } else {
+                    return false;
+                }
+            }
+            if (!result) {
                 return false;
             }
-            return true;
+            std::string str_value1(value1);
+            std::string str_value2(value2);
+            if (dictionary_map[id].find(str_value1) == dictionary_map[id].end()
+                || dictionary_map[id].find(str_value2) == dictionary_map[id].end()) {
+                std::cerr << func_name + ": poset " + std::to_string(id) + ", element \"" + str_value1 + "\" or \"" +
+                             str_value2 + "\" does not exist\n";
+            }
+            return result;
         }
     }
 
@@ -106,11 +155,9 @@ namespace jnp1
         dictionary_map[added_poset] = empty_dictionary;
         graph_map[added_poset] = empty_graph;
         next_id_graph[added_poset] = 0;
-
         if (debug) {
-            std::cerr << "poset_new: ";
+            std::cerr << "poset_new: poset " + std::to_string(new_poset_id) + " created\n";
         }
-
         return added_poset;
     }
 
@@ -118,7 +165,7 @@ namespace jnp1
         if (debug) {
             std::cerr << "poset_delete(" + std::to_string(id) + ")\n";
         }
-        if (dictionary_map.count(id) == 1) {
+        if (dictionary_map.find(id) != dictionary_map.end()) {
             dictionary_map.erase(id);
             next_id_graph.erase(id);
             graph_map.erase(id);
@@ -139,13 +186,17 @@ namespace jnp1
             }
             return 0;
         }
-
-        return graph_map[id].size();
+        size_t result = graph_map[id].size();
+        if (debug) {
+            std::cerr << "poset_size: poset " + std::to_string(id) + " contains " + std::to_string(result) +
+                         " element(s)\n";
+        }
+        return result;
     }
 
     bool poset_insert(unsigned long id, char const *value) {
         if (value == NULL) {
-            if (debug && dictionary_map.count(id) == 0) {
+            if (debug && dictionary_map.find(id) == dictionary_map.end()) {
                 std::cerr << "poset_insert(" + std::to_string(id) + ", \"NULL\")\n"
                      << "poset_insert: poset " + std::to_string(id) + " does not exist\n"
                      << "poset_insert: invalid value (NULL)\n";
@@ -205,7 +256,8 @@ namespace jnp1
             result &= false;
         } else if (dictionary_map[id].find(str_value) == dictionary_map[id].end()) {
             if (debug) {
-                std::cerr << "poset_remove: \n";
+                std::cerr << "poset_remove: poset " + std::to_string(id) +
+                    ", element \"" + str_value + "\" does not exist\n";
             }
         }
         if (!result) return false;
@@ -215,6 +267,10 @@ namespace jnp1
             (iter -> second).erase(node);
         }
         graph_map[id].erase(node);
+        if (debug) {
+            std::cerr << "poset_remove: poset " + std::to_string(id) +
+                         ", element \"" + str_value + "\" removed\n";
+        }
         return true;
     }
 
@@ -229,7 +285,8 @@ namespace jnp1
         std::string str_value1(value1);
         std::string str_value2(value2);
 
-        if (dictionary_map[id].count(str_value1) == 0 || dictionary_map[id].count(str_value2) == 0) {
+        if (dictionary_map[id].find(str_value1) == dictionary_map[id].end()
+            || dictionary_map[id].find(str_value2) == dictionary_map[id].end()) {
             if (debug) {
                 sup::three_arg_debug("poset_add", id, value1, value2);
             }
@@ -256,27 +313,12 @@ namespace jnp1
     }
 
     bool poset_del(unsigned long id, char const *value1, char const *value2) {
-        if (!sup::three_arg_debug("poset_del", id, value1, value2)) {
+
+        if (!sup::verify_three_args("poset_del", id, value1, value2)) {
             return false;
         }
         std::string str_value1(value1);
         std::string str_value2(value2);
-        bool result = true;
-        if (dictionary_map[id].find(str_value1) == dictionary_map[id].end()) {
-            if (debug) {
-                std::cerr << "poset_del";
-            }
-            result &= false;
-        }
-        if (dictionary_map[id].find(str_value2) == dictionary_map[id].end()) {
-            if (debug) {
-                std::cerr << "poset_del";
-            }
-            result &= false;
-        }
-        if (!result) {
-            return false;
-        }
         id_graph node_val1 = dictionary_map[id][value1];
         id_graph node_val2 = dictionary_map[id][value2];
         if (sup::poset_test_main(id, str_value1, str_value2)) {
@@ -328,5 +370,8 @@ namespace jnp1
             (iter -> second).clear();
         }
         graph_map[id].clear();
+        if (debug) {
+            std::cerr << "poset_clear: poset " + std::to_string(id) + " cleared\n";
+        }
     }
 }
