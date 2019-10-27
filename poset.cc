@@ -30,9 +30,42 @@ namespace jnp1
     unsigned long new_poset_id = 0;
 
     namespace sup {
+
+        /*      Funkcja pomocnicza funkcji poset_test_main. Oblicza rekursywnie i dynamicznie, czy element o
+         *      identyfikatorze value1 poprzedza element o identyfikatorze value2.
+         *
+         *  Parametry :
+         *      id                : Identyfikator badanego posetu.
+         *      value1            : Identyfikator elementu potencjalnie poprzedzającego.
+         *      value2            : Identyfikator elementu potencjalnie poprzedzanego.
+         *      calculated_values : Mapa dynamicznie spamiętująca, czy wartość funkcji dla danego value1 została już
+         *                          obliczona, czy też nie.
+         *  Return :
+         *      Wartość true, jeżeli element value1 poprzedza element value2, lub false w przeciwnym przypadku.
+         */
+        bool recursive_relation_test(unsigned long id, id_graph value1, id_graph value2,
+                                     std::unordered_map<id_graph, bool> calculated_values) {
+            bool result = false;
+            if (graph_map[id][value1].find(value2) != graph_map[id][value1].end()) {
+                return true;
+            }
+
+            // Funkcja rekursywnie sprawdza wszystkie gałęzie grafu.
+            for (auto iter = graph_map[id][value1].begin(); iter != graph_map[id][value1].end() && !result; iter++) {
+                if (calculated_values[*iter] == false) {
+                    result = recursive_relation_test(id, *iter, value2, calculated_values);
+                }
+            }
+
+            calculated_values[value1] = true;
+            return result;
+
+        }
+
         /*      Funkcja badająca czy element value1 poprzedza element value2 w posecie o identyfikatorze id. Zakłada,
          *      że taki poset istnieje, i że elementy value1 i value2 do niego należą. Nie zakłada, że value1 nie jest
-         *      równe value2 (zwraca wartość true w takim przypadku).
+         *      równe value2 (zwraca wartość true w takim przypadku). Pesymistyczna złożoność czasowa liniowa względem
+         *      liczby elementów posetu id.
          *
          *  Parametry :
          *      id     : Identyfikator badanego posetu.
@@ -45,8 +78,15 @@ namespace jnp1
             if (value1.compare(value2)) {
                 return true;
             }
+            // Mapa przechowująca obliczone wartości. Jeżeli wartość została obliczona value wartość w mapie wynosi
+            // true, w przeciwnym przypadku false.
+            std::unordered_map<id_graph, bool> calculated_values;
+            for (auto iter = dictionary_map[id].begin(); iter != dictionary_map[id].end(); iter++) {
+                calculated_values.emplace(iter->second, false);
+            }
 
-            return false;
+            return recursive_relation_test(id, dictionary_map[id][value1], dictionary_map[id][value2],
+                                           calculated_values);
         }
 
         /*      Funkcja wypisująca debugowe informacje dla funkcji o formacie func_name(unsigned long id, char const
@@ -273,7 +313,6 @@ namespace jnp1
         }
         return true;
     }
-
 
     bool poset_test2(unsigned long id, char const *value1, char const *value2) {
         if (value1 == NULL) {
