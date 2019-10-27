@@ -98,102 +98,65 @@ namespace jnp1
                                            calculated_values);
         }
 
-        /*      Funkcja wypisująca debugowe informacje dla funkcji o formacie func_name(unsigned long id, char const
-         *      *value1, char const *value2) gdzie poset o podanym identyfikatorze nie istnieje, któryś z elementów ma
-         *      wartość NULL lub któryś z elementów nie należy do posetu o podanym identyfikatorze.
-         *
+        /*      Funkcja weryfikująca poprawność argumentów funkcji o formacie func_name(id_poset id, char const *value1,
+         *      char const *value2) i wypisująca stosowne informacje debuggowe.
          *  Parametry :
          *      func_name : string zawierający nazwę debugowanej funkcji.
          *      id        : Argument id debugowanej funkcji.
          *      value1    : Argument value1 debugowanej funkcji.
          *      value2    : Argument value2 debugowanej funkcji.
          *  Return :
-         *      void
+         *      Wartość true, jeżeli argumenty są poprawne, lub false, gdy poset o danym id nie istnieje, któryś z
+         *      argumentów value1, value2 jest NULL lub któryś z elementów value1, value2 nie należy do zadanego posetu.
          */
-        void three_arg_debug(std::string const &func_name, id_poset id, char const *value1, char const *value2) {
+        bool verify_three_arg(std::string const &func_name, id_poset id, char const *value1, char const *value2) {
             if (value1 == NULL) {
-                if (value2 == NULL) {
-                    std::cerr << func_name + "(" + std::to_string(id) + ", \"NULL\", \"NULL\")\n";
-                } else {
-                    std::string str_value2(value2);
-                    std::cerr << func_name + "(" + std::to_string(id) + ", \"NULL\", " + str_value2 + ")\n";
+                if (debug) {
+                    if (value2 == NULL) {
+                        std::cerr << func_name + "(" + std::to_string(id) + ", \"NULL\", \"NULL\")\n";
+                    } else {
+                        std::string str_value2(value2);
+                        std::cerr << func_name + "(" + std::to_string(id) + ", \"NULL\", " + str_value2 + ")\n";
+                    }
+                    if (dictionary_map.count(id) == 0) {
+                        std::cerr << func_name + ": poset " + std::to_string(id) + " does not exist\n";
+                    }
+                    std::cerr << func_name + ": invalid value1 (NULL)\n";
+                    if (value2 == NULL) {
+                        std::cerr << func_name + ": invalid value2 (NULL)\n";
+                    }
                 }
-                if (dictionary_map.count(id) == 0) {
-                    std::cerr << func_name + ": poset " + std::to_string(id) + " does not exist\n";
-                }
-                std::cerr << func_name + ": invalid value1 (NULL)\n";
-                if (value2 == NULL) {
+                return false;
+            } else if (value2 == NULL) {
+                if (debug) {
+                    std::string str_value1(value1);
+                    std::cerr << func_name + "(" + std::to_string(id) + ", " + str_value1 + ", \"NULL\")\n";
+                    if (dictionary_map.count(id) == 0) {
+                        std::cerr << func_name + ": poset " + std::to_string(id) + " does not exist\n";
+                    }
                     std::cerr << func_name + ": invalid value2 (NULL)\n";
                 }
-            } else if (value2 == NULL) {
-                std::string str_value1(value1);
-                std::cerr << func_name + "(" + std::to_string(id) + ", " + str_value1 + ", \"NULL\")\n";
-                if (dictionary_map.count(id) == 0) {
-                    std::cerr << func_name + ": poset " + std::to_string(id) + " does not exist\n";
-                }
-                std::cerr << func_name + ": invalid value2 (NULL)\n";
+                return false;
             } else {
                 std::string str_value1(value1);
                 std::string str_value2(value2);
-                std::cerr << func_name + "(" + std::to_string(id) + ", " + str_value1 + ", " + str_value2 + ")\n";
-                std::cerr << func_name + ": poset " + std::to_string(id) + ", element \"" + str_value1 + "\" or \"" +
-                             str_value2 + "\" does not exist\n";
+                if (debug) {
+                    std::cerr << func_name + "(" + std::to_string(id) + ", " + str_value1 + ", " + str_value2 + ")\n";
+                }
+                if (dictionary_map[id].find(str_value1) == dictionary_map[id].end() ||
+                    dictionary_map[id].find(str_value2) == dictionary_map[id].end()) {
+                        if (debug) {
+                            std::cerr << func_name + ": poset " + std::to_string(id) + ", element \"" + str_value1 +
+                                         "\" or \"" + str_value2 + "\" does not exist\n";
+                        }
+                        return false;
+                } else {
+                    return true;
+                }
             }
 
         }
 
-        /* Funkcja weryfikująca podane parametry
-         * Sprawdza, czy istnieje poset o danym id, czy zmienne value nie są nullami, czy istnieją w posecie
-         * elementy o identyfikatorach równych zmiennym value1/value2 oraz wypisuje stosowne informacje na wyjście
-         * diagnostyczne
-         *
-         * Parametry :
-         *      func_name : string zawierający nazwę debugowanej funkcji.
-         *      id        : Argument id debugowanej funkcji.
-         *      value1    : Argument value1 debugowanej funkcji.
-         *      value2    : Argument value2 debugowanej funkcji.
-         *  Return :
-         *      true - jeżeli dane są podane w poprawnym formacie i są dostępne w posecie
-         *      false - w przeciwnym wypadku
-         */
-        bool verify_three_args(std::string const &func_name, id_poset id, char const *value1, char const *value2) {
-            bool result = true;
-            if (dictionary_map.find(id) == dictionary_map.end()) {
-                if (debug) {
-                    std::cerr << func_name << ": poset " + std::to_string(id) + " does not exist\n";
-                    result = false;
-                } else {
-                    return false;
-                }
-            }
-            if (value1 == NULL) {
-                if (debug) {
-                    std::cerr << func_name + ": invalid value1 (NULL)\n";
-                    result = false;
-                } else {
-                    return false;
-                }
-            }
-            if (value2 == NULL) {
-                if (debug) {
-                    std::cerr << func_name + ": invalid value2 (NULL)\n";
-                    result = false;
-                } else {
-                    return false;
-                }
-            }
-            if (!result) {
-                return false;
-            }
-            std::string str_value1(value1);
-            std::string str_value2(value2);
-            if (dictionary_map[id].find(str_value1) == dictionary_map[id].end()
-                || dictionary_map[id].find(str_value2) == dictionary_map[id].end()) {
-                std::cerr << func_name + ": poset " + std::to_string(id) + ", element \"" + str_value1 + "\" or \"" +
-                             str_value2 + "\" does not exist\n";
-            }
-            return result;
-        }
     }
 
     unsigned long poset_new(void) {
@@ -323,24 +286,13 @@ namespace jnp1
         return true;
     }
 
-    bool poset_test2(id_poset id, char const *value1, char const *value2) {
-        if (value1 == NULL) {
-            if (debug) {
-                sup::three_arg_debug("poset_add", id, value1, value2);
-            }
+    bool poset_add(id_poset id, char const *value1, char const *value2) {
+        if (!sup::verify_three_arg("poset_add", id, value1, value2)) {
             return false;
         }
+
         std::string str_value1(value1);
         std::string str_value2(value2);
-
-        if (dictionary_map[id].find(str_value1) == dictionary_map[id].end()
-            || dictionary_map[id].find(str_value2) == dictionary_map[id].end()) {
-            if (debug) {
-                sup::three_arg_debug("poset_add", id, value1, value2);
-            }
-            sup::three_arg_debug("poset_add", id, value1, value2);
-            return false;
-        }
 
         if (sup::poset_test_main(id, str_value1, str_value2) || sup::poset_test_main(id, str_value2, str_value1)) {
             if (debug) {
@@ -361,14 +313,15 @@ namespace jnp1
     }
 
     bool poset_del(id_poset id, char const *value1, char const *value2) {
-
-        if (!sup::verify_three_args("poset_del", id, value1, value2)) {
+        if (!sup::verify_three_arg("poset_del", id, value1, value2)) {
             return false;
         }
+
         std::string str_value1(value1);
         std::string str_value2(value2);
         id_graph node_val1 = dictionary_map[id][value1];
         id_graph node_val2 = dictionary_map[id][value2];
+
         if (sup::poset_test_main(id, str_value1, str_value2)) {
             graph_map[id][node_val2].erase(node_val2);
         } else {
@@ -378,22 +331,12 @@ namespace jnp1
     }
 
     bool poset_test(id_poset id, char const *value1, char const *value2) {
-        if (value1 == NULL || value2 == NULL || dictionary_map.count(id) == 0) {
-            if (debug) {
-                sup::three_arg_debug("poset_insert", id, value1, value2);
-            }
+        if (!sup::verify_three_arg("poset_test", id, value1, value2)) {
             return false;
         }
+
         std::string str_value1(value1);
         std::string str_value2(value2);
-
-        if (dictionary_map[id].count(str_value1) == 0 || dictionary_map[id].count(str_value2) == 0) {
-            if (debug) {
-                sup::three_arg_debug("poset_insert", id, value1, value2);
-            }
-            sup::three_arg_debug("poset_insert", id, value1, value2);
-            return false;
-        }
 
         if (sup::poset_test_main(id, str_value1, str_value2)) {
             if (debug) {
