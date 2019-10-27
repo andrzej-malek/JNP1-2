@@ -53,7 +53,7 @@ namespace jnp1
          *      Wartość true, jeżeli element value1 poprzedza element value2, lub false w przeciwnym przypadku.
          */
         bool recursive_relation_test(id_poset id, id_graph value1, id_graph value2,
-                                     std::unordered_map<id_graph, bool> calculated_values) {
+                                     std::unordered_map<id_graph, bool> &calculated_values) {
             bool result = false;
             if (graph_map[id][value1].find(value2) != graph_map[id][value1].end()) {
                 return true;
@@ -62,7 +62,7 @@ namespace jnp1
             // Funkcja rekursywnie sprawdza wszystkie gałęzie grafu.
             for (auto iter = graph_map[id][value1].begin(); iter != graph_map[id][value1].end() && !result; iter++) {
                 if (calculated_values[*iter] == false) {
-                    result = recursive_relation_test(id, *iter, value2, calculated_values);
+                    result = result || recursive_relation_test(id, *iter, value2, calculated_values);
                 }
             }
 
