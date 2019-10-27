@@ -6,6 +6,8 @@
 #ifndef POSET_H
 #define POSET_H
 
+#define NDEBUG
+
 #ifndef __cplusplus
 #include <stdbool.h>
 #endif

@@ -290,10 +290,8 @@ namespace jnp1
         if (!sup::verify_three_arg("poset_add", id, value1, value2)) {
             return false;
         }
-
         std::string str_value1(value1);
         std::string str_value2(value2);
-
         if (sup::poset_test_main(id, str_value1, str_value2) || sup::poset_test_main(id, str_value2, str_value1)) {
             if (debug) {
                 std::cerr << "poset_add: poset " + std::to_string(id) + ", relation (\"" + str_value1 + "\", \"" +
@@ -322,11 +320,13 @@ namespace jnp1
         id_graph node_val1 = dictionary_map[id][value1];
         id_graph node_val2 = dictionary_map[id][value2];
 
-        if (sup::poset_test_main(id, str_value1, str_value2)) {
-            graph_map[id][node_val2].erase(node_val2);
-        } else {
+        if (!sup::poset_test_main(id, str_value1, str_value2)) {
             return false;
         }
+        for (auto iter = graph_map[id][node_val2].begin(); iter != graph_map[id][node_val2].end(); iter++) {
+            graph_map[id][node_val1].insert(*iter);
+        }
+        graph_map[id][node_val1].erase(node_val2);
         return true;
     }
 
