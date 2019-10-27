@@ -58,7 +58,6 @@ namespace jnp1
             if (graph_map[id][value1].find(value2) != graph_map[id][value1].end()) {
                 return true;
             }
-
             // Funkcja rekursywnie sprawdza wszystkie gałęzie grafu.
             for (auto iter = graph_map[id][value1].begin(); iter != graph_map[id][value1].end() && !result; iter++) {
                 if (calculated_values[*iter] == false) {
@@ -84,7 +83,7 @@ namespace jnp1
          *      Wartość true, jeżeli element value1 poprzedza element value2, lub false w przeciwnym przypadku.
          */
         bool poset_test_main(id_poset id, std::string const &value1, std::string const &value2) {
-            if (value1.compare(value2)) {
+            if (!value1.compare(value2)) {
                 return true;
             }
             // Mapa przechowująca obliczone wartości. Jeżeli wartość została obliczona value wartość w mapie wynosi
@@ -93,7 +92,6 @@ namespace jnp1
             for (auto iter = dictionary_map[id].begin(); iter != dictionary_map[id].end(); iter++) {
                 calculated_values.emplace(iter->second, false);
             }
-
             return recursive_relation_test(id, dictionary_map[id][value1], dictionary_map[id][value2],
                                            calculated_values);
         }
@@ -320,13 +318,18 @@ namespace jnp1
         id_graph node_val1 = dictionary_map[id][value1];
         id_graph node_val2 = dictionary_map[id][value2];
 
-        if (!sup::poset_test_main(id, str_value1, str_value2)) {
+        if (!sup::poset_test_main(id, str_value1, str_value2)
+            || graph_map[id][node_val1].find(node_val2) == graph_map[id][node_val1].end()) {
+            std::cerr << "poset_del: poset " + std::to_string(id)
+                + " relation (\"" + str_value1 + "\", \"" +  str_value2 + "\") cannot be deleted\n";
             return false;
         }
         for (auto iter = graph_map[id][node_val2].begin(); iter != graph_map[id][node_val2].end(); iter++) {
             graph_map[id][node_val1].insert(*iter);
         }
         graph_map[id][node_val1].erase(node_val2);
+        std::cerr << "poset_del: poset " + std::to_string(id)
+                     + " relation (\"" + str_value1 + "\", \"" +  str_value2 + "\") deleted\n";
         return true;
     }
 
