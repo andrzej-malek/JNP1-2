@@ -6,15 +6,18 @@
 #ifndef POSET_H
 #define POSET_H
 
-#define NDEBUG
+#ifdef NDEBUG
+#ifdef __cplusplus
+#include <iostream>
+#endif
+#endif
 
 #ifndef __cplusplus
 #include <stdbool.h>
 #endif
 
 #ifdef __cplusplus
-namespace jnp1
-{
+namespace jnp1 {
     extern "C" {
 #endif
 

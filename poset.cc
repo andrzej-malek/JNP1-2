@@ -7,18 +7,16 @@
     const bool debug = true;
 #else
     const bool debug = false;
-
 #endif
 
+#include "poset.h"
 #include <unordered_map>
 #include <unordered_set>
 #include <iostream>
 #include <string>
 
-#include "poset.h"
 
-namespace jnp1
-{
+namespace jnp1 {
     // Typ identyfikatora elementów posetu.
     using id_graph = unsigned int;
     // Typ reprezentujący poset w postaci grafu skierowanego. Dla każdego elementu pod adresem jego identyfikatora
@@ -29,16 +27,25 @@ namespace jnp1
     // Typ identyfikatora posetu.
     using id_poset = unsigned long;
 
-    // Zmienna globalna przechowująca słowniki posetów.
-    std::unordered_map<id_poset, dictionary> dictionary_map;
-    // Zmienna globalna przechowująca wartość identyfikatora dla następnego elementu danego posetu.
-    std::unordered_map<id_poset, id_graph> next_id_graph;
-    // Zmienna globalna przechowująca reprezentację grafową posetów.
-    std::unordered_map<id_poset, graph> graph_map;
-    // Zmienna globalna przechowująca wartość identyfikatora dla następnego posetu.
-    id_poset new_poset_id = 0;
+    namespace {
 
-    namespace sup {
+        // Zmienna globalna przechowująca słowniki posetów.
+        std::unordered_map<id_poset, dictionary>& dictionary_map() {
+            static std::unordered_map<id_poset, dictionary> *value = new std::unordered_map<id_poset, dictionary>;
+            return *value;
+        };
+        // Zmienna globalna przechowująca wartość identyfikatora dla następnego elementu danego posetu.
+        std::unordered_map<id_poset, id_graph>& next_id_graph() {
+            static std::unordered_map<id_poset, id_graph> *value = new std::unordered_map<id_poset, id_graph>;
+            return *value;
+        }
+        // Zmienna globalna przechowująca reprezentację grafową posetów.
+        std::unordered_map<id_poset, graph>& graph_map {
+            static std::unordered_map<id_poset, graph> *value = new std::unordered_map<id_poset, graph>;
+            return *value;
+        }
+        // Zmienna globalna przechowująca wartość identyfikatora dla następnego posetu.
+        id_poset new_poset_id = 0;
 
         /*      Funkcja pomocnicza funkcji poset_test_main. Oblicza rekursywnie i dynamicznie, czy element o
          *      identyfikatorze value1 poprzedza element o identyfikatorze value2.
@@ -59,7 +66,7 @@ namespace jnp1
                 return true;
             }
             // Funkcja rekursywnie sprawdza wszystkie gałęzie grafu.
-            for (auto iter = graph_map[id][value1].begin(); iter != graph_map[id][value1].end() && !result; iter++) {
+            for (auto iter = graph_map[id][value1].begin(); iter != graph_map[id][value1].end() && !result; ++iter) {
                 if (calculated_values[*iter] == false) {
                     result = result || recursive_relation_test(id, *iter, value2, calculated_values);
                 }
@@ -67,7 +74,6 @@ namespace jnp1
 
             calculated_values[value1] = true;
             return result;
-
         }
 
         /*      Funkcja badająca czy element value1 poprzedza element value2 w posecie o identyfikatorze id. Zakłada,
@@ -89,7 +95,7 @@ namespace jnp1
             // Mapa przechowująca obliczone wartości. Jeżeli wartość została obliczona value wartość w mapie wynosi
             // true, w przeciwnym przypadku false.
             std::unordered_map<id_graph, bool> calculated_values;
-            for (auto iter = dictionary_map[id].begin(); iter != dictionary_map[id].end(); iter++) {
+            for (auto iter = dictionary_map[id].begin(); iter != dictionary_map[id].end(); ++iter) {
                 calculated_values.emplace(iter->second, false);
             }
             return recursive_relation_test(id, dictionary_map[id][value1], dictionary_map[id][value2],
@@ -152,14 +158,13 @@ namespace jnp1
                     return true;
                 }
             }
-
         }
 
     }
 
     unsigned long poset_new(void) {
         id_poset added_poset = new_poset_id;
-        new_poset_id++;
+        ++new_poset_id;
         dictionary empty_dictionary;
         graph empty_graph;
         dictionary_map[added_poset] = empty_dictionary;
@@ -236,12 +241,11 @@ namespace jnp1
                 std::cerr << "poset_insert: poset " + std::to_string(id) + ", element \"" + str_value +
                              "\" already exists\n";
             }
-
             return false;
         }
 
         dictionary_map[id].insert({str_value, next_id_graph[id]});
-        (next_id_graph[id])++;
+        ++(next_id_graph[id]);
         if (debug) {
             std::cerr << "poset_insert: poset " + std::to_string(id) + ", element \"" + str_value + "\" inserted\n";
         }
@@ -270,10 +274,11 @@ namespace jnp1
                     ", element \"" + str_value + "\" does not exist\n";
             }
         }
+
         if (!result) return false;
 
         id_graph node = dictionary_map[id][str_value];
-        for (auto iter = graph_map[id].begin(); iter != graph_map[id].end(); iter++) {
+        for (auto iter = graph_map[id].begin(); iter != graph_map[id].end(); ++iter) {
             (iter -> second).erase(node);
         }
         graph_map[id].erase(node);
@@ -281,6 +286,7 @@ namespace jnp1
             std::cerr << "poset_remove: poset " + std::to_string(id) +
                          ", element \"" + str_value + "\" removed\n";
         }
+
         return true;
     }
 
@@ -295,6 +301,7 @@ namespace jnp1
                 std::cerr << "poset_add: poset " + std::to_string(id) + ", relation (\"" + str_value1 + "\", \"" +
                              str_value2 + "\") cannot be added\n";
             }
+
             return false;
         } else {
             id_graph value1_id = dictionary_map[id][str_value1];
@@ -304,6 +311,7 @@ namespace jnp1
                 std::cerr << "poset_add: poset " + std::to_string(id) + ", relation (\"" + str_value1 + "\", \"" +
                              str_value2 + "\") added\n";
             }
+
             return true;
         }
     }
@@ -322,9 +330,10 @@ namespace jnp1
             || graph_map[id][node_val1].find(node_val2) == graph_map[id][node_val1].end()) {
             std::cerr << "poset_del: poset " + std::to_string(id)
                 + " relation (\"" + str_value1 + "\", \"" +  str_value2 + "\") cannot be deleted\n";
+
             return false;
         }
-        for (auto iter = graph_map[id][node_val2].begin(); iter != graph_map[id][node_val2].end(); iter++) {
+        for (auto iter = graph_map[id][node_val2].begin(); iter != graph_map[id][node_val2].end(); ++iter) {
             graph_map[id][node_val1].insert(*iter);
         }
         graph_map[id][node_val1].erase(node_val2);
@@ -360,7 +369,7 @@ namespace jnp1
         dictionary_map.erase(id);
         next_id_graph.erase(id);
         dictionary_map[id].clear();
-        for (auto iter = graph_map[id].begin(); iter != graph_map[id].end(); iter++) {
+        for (auto iter = graph_map[id].begin(); iter != graph_map[id].end(); ++iter) {
             (iter -> second).clear();
         }
         graph_map[id].clear();
