@@ -325,15 +325,18 @@ namespace jnp1 {
 
         if (!poset_test_main(id, str_value1, str_value2)
             || graph_map()[id][node_val1].find(node_val2) == graph_map()[id][node_val1].end()) {
-            std::cerr << "poset_del: poset " + std::to_string(id)
-                + " relation (\"" + str_value1 + "\", \"" +  str_value2 + "\") cannot be deleted\n";
-
+            if (debug) {
+                std::cerr << "poset_del: poset " + std::to_string(id)
+                             + " relation (\"" + str_value1 + "\", \"" + str_value2 + "\") cannot be deleted\n";
+            }
             return false;
         }
 
         graph_map()[id][node_val1].erase(node_val2);
-        std::cerr << "poset_del: poset " + std::to_string(id)
-                     + " relation (\"" + str_value1 + "\", \"" +  str_value2 + "\") deleted\n";
+        if (debug) {
+            std::cerr << "poset_del: poset " + std::to_string(id)
+                         + " relation (\"" + str_value1 + "\", \"" + str_value2 + "\") deleted\n";
+        }
         return true;
     }
 
