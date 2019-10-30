@@ -218,23 +218,18 @@ namespace jnp1 {
                 std::cerr << "poset_insert(" + std::to_string(id) + ", \"NULL\")\n"
                      << "poset_insert: invalid value (NULL)\n";
             }
-
             return false;
         }
-
         std::string str_value(value);
         if (debug) {
             std::cerr << "poset_insert(" + std::to_string(id) + ", \"" + str_value + "\")\n";
         }
-
         if (dictionary_map().count(id) == 0) {
             if (debug) {
                 std::cerr << "poset_insert: poset " + std::to_string(id) + " does not exist\n";
             }
-
             return false;
         }
-
         if (dictionary_map()[id].count(str_value) == 1) {
             if (debug) {
                 std::cerr << "poset_insert: poset " + std::to_string(id) + ", element \"" + str_value +
@@ -242,13 +237,11 @@ namespace jnp1 {
             }
             return false;
         }
-
         dictionary_map()[id].insert({str_value, next_id_graph()[id]});
         ++(next_id_graph()[id]);
         if (debug) {
             std::cerr << "poset_insert: poset " + std::to_string(id) + ", element \"" + str_value + "\" inserted\n";
         }
-
         return true;
     }
 
@@ -273,9 +266,7 @@ namespace jnp1 {
                     ", element \"" + str_value + "\" does not exist\n";
             }
         }
-
         if (!result) return false;
-
         id_graph node = dictionary_map()[id][str_value];
         for (auto iter = graph_map()[id].begin(); iter != graph_map()[id].end(); ++iter) {
             (iter -> second).erase(node);
@@ -285,7 +276,6 @@ namespace jnp1 {
             std::cerr << "poset_remove: poset " + std::to_string(id) +
                          ", element \"" + str_value + "\" removed\n";
         }
-
         return true;
     }
 
@@ -300,7 +290,6 @@ namespace jnp1 {
                 std::cerr << "poset_add: poset " + std::to_string(id) + ", relation (\"" + str_value1 + "\", \"" +
                              str_value2 + "\") cannot be added\n";
             }
-
             return false;
         } else {
             id_graph value1_id = dictionary_map()[id][str_value1];
@@ -322,7 +311,6 @@ namespace jnp1 {
         std::string str_value2(value2);
         id_graph node_val1 = dictionary_map()[id][value1];
         id_graph node_val2 = dictionary_map()[id][value2];
-
         if (!poset_test_main(id, str_value1, str_value2)
             || graph_map()[id][node_val1].find(node_val2) == graph_map()[id][node_val1].end()) {
             if (debug) {
@@ -331,7 +319,17 @@ namespace jnp1 {
             }
             return false;
         }
-
+        for (auto iter = graph_map()[id][node_val1].begin(); iter != graph_map()[id][node_val1].end(); ++iter) {
+            if (*iter == node_val2) {
+                continue;
+            } else if (graph_map()[id][*iter].find(node_val2) != graph_map()[id][*iter].end()) {
+                if (debug) {
+                    std::cerr << "poset_del: poset " + std::to_string(id)
+                                 + " relation (\"" + str_value1 + "\", \"" + str_value2 + "\") cannot be deleted\n";
+                }
+                return false;
+            }
+        }
         graph_map()[id][node_val1].erase(node_val2);
         if (debug) {
             std::cerr << "poset_del: poset " + std::to_string(id)
@@ -344,10 +342,8 @@ namespace jnp1 {
         if (!verify_three_arg("poset_test", id, value1, value2)) {
             return false;
         }
-
         std::string str_value1(value1);
         std::string str_value2(value2);
-
         if (poset_test_main(id, str_value1, str_value2)) {
             if (debug) {
                 std::cerr << "poset_test: poset " + std::to_string(id) + ", relation (\"" + str_value1 + "\", \"" +
