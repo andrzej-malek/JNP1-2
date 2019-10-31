@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 
-#ifdef NDEBUG
+#ifndef NDEBUG
     const bool debug = true;
 #else
     const bool debug = false;

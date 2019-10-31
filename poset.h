@@ -6,7 +6,7 @@
 #ifndef POSET_H
 #define POSET_H
 
-#ifdef NDEBUG
+#ifndef NDEBUG
 #ifdef __cplusplus
 #include <iostream>
 #endif
