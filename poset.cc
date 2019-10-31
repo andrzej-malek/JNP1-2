@@ -75,7 +75,6 @@ namespace jnp1 {
                     result = result || recursive_relation_test(id, *iter, value2, calculated_values);
                 }
             }
-
             calculated_values[value1] = true;
             return result;
         }
@@ -98,12 +97,19 @@ namespace jnp1 {
             }
             // Mapa przechowująca obliczone wartości. Jeżeli wartość została obliczona value wartość w mapie wynosi
             // true, w przeciwnym przypadku false.
+            id_graph node1 = dictionary_map()[id][value1];
+            id_graph node2 = dictionary_map()[id][value2];
+            if (graph_map()[id][node1].find(node2) == graph_map()[id][node1].end()) {
+                return false;
+            }
+            return true;
+            /*
             std::unordered_map<id_graph, bool> calculated_values;
             for (auto iter = dictionary_map()[id].begin(); iter != dictionary_map()[id].end(); ++iter) {
                 calculated_values.emplace(iter->second, false);
             }
             return recursive_relation_test(id, dictionary_map()[id][value1], dictionary_map()[id][value2],
-                                           calculated_values);
+                                           calculated_values);*/
         }
 
         /*      Funkcja weryfikująca poprawność argumentów funkcji o formacie func_name(id_poset id, char const *value1,
