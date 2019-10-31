@@ -106,7 +106,7 @@ namespace jnp1 {
                         std::cerr << func_name + "(" + std::to_string(id) + ", \"NULL\", \"NULL\")\n";
                     } else {
                         std::string str_value2(value2);
-                        std::cerr << func_name + "(" + std::to_string(id) + ", \"NULL\", " + str_value2 + ")\n";
+                        std::cerr << func_name + "(" + std::to_string(id) + ", \"NULL\", \"" + str_value2 + "\")\n";
                     }
                     if (dictionary_map().find(id) == dictionary_map().end()) {
                         std::cerr << func_name + ": poset " + std::to_string(id) + " does not exist\n";
@@ -120,7 +120,7 @@ namespace jnp1 {
             } else if (value2 == NULL) {
                 if (debug) {
                     std::string str_value1(value1);
-                    std::cerr << func_name + "(" + std::to_string(id) + ", " + str_value1 + ", \"NULL\")\n";
+                    std::cerr << func_name + "(" + std::to_string(id) + ", \"" + str_value1 + "\", \"NULL\")\n";
                     if (dictionary_map().find(id) == dictionary_map().end()) {
                         std::cerr << func_name + ": poset " + std::to_string(id) + " does not exist\n";
                     }
@@ -131,7 +131,8 @@ namespace jnp1 {
                 if (debug) {
                     std::string str_value1(value1);
                     std::string str_value2(value2);
-                    std::cerr << func_name + "(" + std::to_string(id) + ", " + str_value1 + ", " + str_value2 + ")\n";
+                    std::cerr << func_name + "(" + std::to_string(id) + ", \"" + str_value1 + "\", \"" + str_value2 +
+                                 "\")\n";
                     std::cerr << func_name + ": poset " + std::to_string(id) + " does not exist\n";
                 }
                 return false;
@@ -139,7 +140,8 @@ namespace jnp1 {
                 std::string str_value1(value1);
                 std::string str_value2(value2);
                 if (debug) {
-                    std::cerr << func_name + "(" + std::to_string(id) + ", " + str_value1 + ", " + str_value2 + ")\n";
+                    std::cerr << func_name + "(" + std::to_string(id) + ", \"" + str_value1 + "\", \"" + str_value2 +
+                                 "\")\n";
                 }
                 if (dictionary_map()[id].find(str_value1) == dictionary_map()[id].end() ||
                     dictionary_map()[id].find(str_value2) == dictionary_map()[id].end()) {
