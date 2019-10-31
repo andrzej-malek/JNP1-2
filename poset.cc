@@ -318,18 +318,27 @@ namespace jnp1 {
         } else {
             id_graph value1_id = dictionary_map()[id][str_value1];
             id_graph value2_id = dictionary_map()[id][str_value2];
-            for (auto iter = transgraph_map()[id][value1_id].begin();
-                iter != transgraph_map()[id][value1_id].end(); ++iter) {
-                graph_map()[id][*iter].insert(value2_id);
-                transgraph_map()[id][value2_id].insert(*iter);
-            }
-            for (auto iter = graph_map()[id][value2_id].begin();
-                iter != graph_map()[id][value2_id].begin(); ++iter) {
-                graph_map()[id][value1_id].insert(*iter);
-                transgraph_map()[id][*iter].insert(value1_id);
-            }
+            // el1 poprzedza el2 i vice versa
             graph_map()[id][value1_id].insert(value2_id);
             transgraph_map()[id][value2_id].insert(value1_id);
+            // el1 poprzedza wszystkie elementy poprzedzane przez el2 i
+            // el2 poprzedza wszystkie elementy poprzedzane przez el1
+            graph_map()[id][value1_id].insert(graph_map()[id][value2_id].begin(),
+                                              graph_map()[id][value2_id].end());
+            transgraph_map()[id][value2_id].insert(transgraph_map()[id][value1_id].begin(),
+                                                   transgraph_map()[id][value1_id].end());
+            // wszystkie elementy poprzedzające el1 teraz poprzedzają elementy poprzedzane przez el1
+            for (auto iter = (transgraph_map()[id][value1_id]).begin();
+                iter != (transgraph_map()[id][value1_id]).end(); ++iter) {
+                graph_map()[id][*iter].insert(graph_map()[id][value1_id].begin(),
+                                              graph_map()[id][value1_id].end());
+            }
+            // wszystkie elementy poprzedzane przez el2 są poprzedzane przez wszystkie elementy poprzedzające el2
+            for (auto iter = (graph_map()[id][value2_id]).begin();
+                iter != (graph_map()[id][value2_id]).end(); ++iter) {
+                transgraph_map()[id][*iter].insert(transgraph_map()[id][value2_id].begin(),
+                                                   transgraph_map()[id][value2_id].end());
+            }
             if (debug) {
                 std::cerr << "poset_add: poset " + std::to_string(id) + ", relation (\"" + str_value1 + "\", \"" +
                              str_value2 + "\") added\n";
