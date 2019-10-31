@@ -28,35 +28,69 @@ namespace jnp1 {
     using id_poset = unsigned long;
 
     namespace {
-        // Zmienna globalna przechowująca słowniki posetów.
+        /*      Funkcja zwracajaca referencję do globalnej mapy id_poset -> dictionary, przypisującej każdemu
+         *      id posetowemu słownik wierzchołków w grafie.
+         *
+         *  Parametry :
+         *      void
+         *  Return :
+         *      Mapa: id_poset -> (string -> id_graph)
+         */
         std::unordered_map<id_poset, dictionary> &dictionary_map() {
             static std::unordered_map<id_poset, dictionary> *value = new std::unordered_map<id_poset, dictionary>;
             return *value;
         }
 
 
-        // Zmienna globalna przechowująca wartość identyfikatora dla następnego elementu danego posetu.
+        /*      Funkcja zwracająca referencję do globalnej mapy id_poset -> id_graph, przypisującej każdemu
+         *      posetowi nowy wolny identyfikator w grafie.
+         *
+         *  Parametry :
+         *      void
+         *  Return :
+         *      Mapa: id_poset -> (wolny) id_graf
+         */
         std::unordered_map<id_poset, id_graph> &next_id_graph() {
             static std::unordered_map<id_poset, id_graph> *value = new std::unordered_map<id_poset, id_graph>;
             return *value;
         }
 
 
-        // Zmienna globalna przechowująca reprezentację grafową posetów.
+        /*      Funkcja zwracająca referencję do globalnej mapy id_poset -> graph, przypisujący każdemu
+         *      posetowi graf reprezentujący go.
+         *
+         *  Parametry :
+         *      void
+         *  Return :
+         *      Mapa: id_poset -> graph
+         */
         std::unordered_map<id_poset, graph> &graph_map() {
             static std::unordered_map<id_poset, graph> *value = new std::unordered_map<id_poset, graph>;
             return *value;
         }
 
 
-        // Zmienna globalna przechowująca transpozycje reprezentacji grafowej posetów.
+        /*      Funkcja zwracająca referencję do globalnej mapy id_poset -> graph, przypisujący każdemu
+         *      posetowi transponowany graf jego reprezentacji.
+         *
+         *  Parametry :
+         *      void
+         *  Return :
+         *      Mapa: id_poset -> graph (transponowany)
+         */
         std::unordered_map<id_poset, graph> &transgraph_map() {
             static std::unordered_map<id_poset, graph> *value = new std::unordered_map<id_poset, graph>;
             return *value;
         }
 
 
-        // Zmienna globalna przechowująca wartość identyfikatora dla następnego posetu.
+        /*      Funkcja przydzielająca nowe numery id dla dodawanych posetów.
+         *
+         *  Parametry :
+         *      void
+         *  Return :
+         *      Wolny id dla nowego posetu
+         */
         id_poset new_poset_id() {
             static id_poset value = 0;
             return value++;
