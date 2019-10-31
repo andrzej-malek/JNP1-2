@@ -15,9 +15,11 @@
 
 #ifndef __cplusplus
 #include <stdbool.h>
+#include <stddef.h>
 #endif
 
 #ifdef __cplusplus
+#include <cstddef>
 namespace jnp1 {
     extern "C" {
 #endif
