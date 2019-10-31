@@ -29,17 +29,17 @@ namespace jnp1 {
 
     namespace {
         // Zmienna globalna przechowująca słowniki posetów.
-        std::unordered_map<id_poset, dictionary>& dictionary_map() {
+        std::unordered_map<id_poset, dictionary> &dictionary_map() {
             static std::unordered_map<id_poset, dictionary> *value = new std::unordered_map<id_poset, dictionary>;
             return *value;
         };
         // Zmienna globalna przechowująca wartość identyfikatora dla następnego elementu danego posetu.
-        std::unordered_map<id_poset, id_graph>& next_id_graph() {
+        std::unordered_map<id_poset, id_graph> &next_id_graph() {
             static std::unordered_map<id_poset, id_graph> *value = new std::unordered_map<id_poset, id_graph>;
             return *value;
         };
         // Zmienna globalna przechowująca reprezentację grafową posetów.
-        std::unordered_map<id_poset, graph>& graph_map() {
+        std::unordered_map<id_poset, graph> &graph_map() {
             static std::unordered_map<id_poset, graph> *value = new std::unordered_map<id_poset, graph>;
             return *value;
         };
@@ -121,7 +121,7 @@ namespace jnp1 {
                         std::string str_value2(value2);
                         std::cerr << func_name + "(" + std::to_string(id) + ", \"NULL\", " + str_value2 + ")\n";
                     }
-                    if (dictionary_map().count(id) == 0) {
+                    if (dictionary_map().find(id) == dictionary_map().end()) {
                         std::cerr << func_name + ": poset " + std::to_string(id) + " does not exist\n";
                     }
                     std::cerr << func_name + ": invalid value1 (NULL)\n";
@@ -134,7 +134,7 @@ namespace jnp1 {
                 if (debug) {
                     std::string str_value1(value1);
                     std::cerr << func_name + "(" + std::to_string(id) + ", " + str_value1 + ", \"NULL\")\n";
-                    if (dictionary_map().count(id) == 0) {
+                    if (dictionary_map().find(id) == dictionary_map().end()) {
                         std::cerr << func_name + ": poset " + std::to_string(id) + " does not exist\n";
                     }
                     std::cerr << func_name + ": invalid value2 (NULL)\n";
@@ -161,6 +161,7 @@ namespace jnp1 {
 
     }
 
+
     unsigned long poset_new(void) {
         id_poset added_poset = new_poset_id;
         ++new_poset_id;
@@ -174,6 +175,7 @@ namespace jnp1 {
         }
         return added_poset;
     }
+
 
     void poset_delete(id_poset id) {
         if (debug) {
@@ -193,6 +195,7 @@ namespace jnp1 {
         }
     }
 
+
     size_t poset_size(id_poset id) {
         if (dictionary_map().find(id) == dictionary_map().end()) {
             if (debug) {
@@ -207,6 +210,7 @@ namespace jnp1 {
         }
         return result;
     }
+
 
     bool poset_insert(id_poset id, char const *value) {
         if (value == NULL) {
@@ -224,13 +228,13 @@ namespace jnp1 {
         if (debug) {
             std::cerr << "poset_insert(" + std::to_string(id) + ", \"" + str_value + "\")\n";
         }
-        if (dictionary_map().count(id) == 0) {
+        if (dictionary_map().find(id) == dictionary_map().end()) {
             if (debug) {
                 std::cerr << "poset_insert: poset " + std::to_string(id) + " does not exist\n";
             }
             return false;
         }
-        if (dictionary_map()[id].count(str_value) == 1) {
+        if (dictionary_map()[id].find(str_value) != dictionary_map()[id].end()) {
             if (debug) {
                 std::cerr << "poset_insert: poset " + std::to_string(id) + ", element \"" + str_value +
                              "\" already exists\n";
@@ -244,6 +248,7 @@ namespace jnp1 {
         }
         return true;
     }
+
 
     bool poset_remove(id_poset id, char const *value) {
         bool result = true;
@@ -279,6 +284,7 @@ namespace jnp1 {
         return true;
     }
 
+
     bool poset_add(id_poset id, char const *value1, char const *value2) {
         if (!verify_three_arg("poset_add", id, value1, value2)) {
             return false;
@@ -302,6 +308,7 @@ namespace jnp1 {
             return true;
         }
     }
+
 
     bool poset_del(id_poset id, char const *value1, char const *value2) {
         if (!verify_three_arg("poset_del", id, value1, value2)) {
@@ -338,6 +345,7 @@ namespace jnp1 {
         return true;
     }
 
+
     bool poset_test(id_poset id, char const *value1, char const *value2) {
         if (!verify_three_arg("poset_test", id, value1, value2)) {
             return false;
@@ -358,6 +366,7 @@ namespace jnp1 {
             return false;
         }
     }
+
 
     void poset_clear(id_poset id) {
         dictionary_map().erase(id);

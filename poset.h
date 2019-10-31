@@ -6,6 +6,7 @@
 #ifndef POSET_H
 #define POSET_H
 
+
 #ifdef NDEBUG
 #ifdef __cplusplus
 #include <iostream>
@@ -21,7 +22,7 @@ namespace jnp1 {
     extern "C" {
 #endif
 
-        /*      Funkcja tworząca nowy poset.
+        /*      Tworzy nowy poset i zwraca jego identyfikator.
          *
          *  Parametry :
          *      void
@@ -30,7 +31,9 @@ namespace jnp1 {
          */
         unsigned long poset_new(void);
 
-        /*      Funkcja usuwająca poset o podanym id jeżeli istnieje, lub nic nie robiąca w przeciwnym przypadku.
+
+        /*      Jeżeli istnieje poset o identyfikatorze id, usuwa go, a w przeciwnym
+         *      przypadku nic nie robi.
          *
          *  Parametry :
          *      id - Identyfikator posetu do usunięcia.
@@ -39,7 +42,9 @@ namespace jnp1 {
          */
         void poset_delete(unsigned long id);
 
-        /*      Funkcja zwracająca liczbę elementów posetu o podanym identyfikatorze.
+
+        /*      Jeżeli istnieje poset o identyfikatorze id, to wynikiem jest liczba jego
+         *      elementów.
          *
          *  Parametry :
          *      id - Identyfikator poszukiwanego posetu.
@@ -48,7 +53,10 @@ namespace jnp1 {
          */
         size_t poset_size(unsigned long id);
 
-        /*      Funkcja wstawiająca nowy element do posetu.
+
+        /*      Jeżeli istnieje poset o identyfikatorze id i element value nie należy do
+         *      tego zbioru, to dodaje element do zbioru, a w przeciwnym przypadku nic nie
+         *      robi. Nowy element nie jest w relacji z żadnym elementem.
          *
          *  Parametry :
          *      id    - Identyfikator poszukiwanego posetu.
@@ -58,7 +66,10 @@ namespace jnp1 {
          */
         bool poset_insert(unsigned long id, char const *value);
 
-        /*      Funkcja usuwająca element z posetu wraz z jego relacjami.
+
+        /*      Jeżeli istnieje poset o identyfikatorze id i element value należy do tego
+         *      zbioru, to usuwa element ze zbioru oraz usuwa wszystkie relacje tego
+         *      elementu, a w przeciwnym przypadku nic nie robi.
          *
          *  Parametry :
          *      id    - Identyfikator poszukiwanego posetu.
@@ -68,7 +79,11 @@ namespace jnp1 {
          */
         bool poset_remove(unsigned long id, char const *value);
 
-        /*      Funkcja wstawiająca w poset relację między podanymi elementami.
+
+        /*      Jeżeli istnieje poset o identyfikatorze id oraz elementy value1 i value2
+         *      należą do tego zbioru i nie są w relacji, to rozszerza relację w taki
+         *      sposób, aby element value1 poprzedzał element value2 (domyka relację
+         *      przechodnio), a w przeciwnym przypadku nic nie robi.
          *
          *  Parametry :
          *      id     - Identyfikator poszukiwanego posetu.
@@ -79,7 +94,12 @@ namespace jnp1 {
          */
         bool poset_add(unsigned long id, char const *value1, char const *value2);
 
-        /*      Funkcja usuwająca relację między podanymi elementami.
+
+        /*      Jeżeli istnieje poset o identyfikatorze id, elementy value1 i value2
+         *      należą do tego zbioru, element value1 poprzedza element value2 oraz
+         *      usunięcie relacji między elementami value1 i value2 nie zaburzy warunków
+         *      bycia częściowym porządkiem, to usuwa relację między tymi elementami,
+         *      a w przeciwnym przypadku nic nie robi.
          *
          *  Parametry :
          *      id     - Identyfikator poszukiwanego posetu.
@@ -89,6 +109,7 @@ namespace jnp1 {
          *      Wartość true, jeżeli zaszły zmiany w relacjach posetu, lub false w przeciwnym przypadku.
          */
         bool poset_del(unsigned long id, char const *value1, char const *value2);
+
 
         /*      Funkcja sprawdzająca, czy w danym posecie jeden element poprzedza drugi.
          *
@@ -102,7 +123,9 @@ namespace jnp1 {
          */
         bool poset_test(unsigned long id, char const *value1, char const *value2);
 
-        /*      Funkcja usuwająca poset.
+
+        /*      Jeżeli istnieje poset o identyfikatorze id, usuwa wszystkie jego elementy
+         *      oraz relacje między nimi, a w przeciwnym przypadku nic nie robi.
          *
          *  Parametry :
          *      id - Identyfikator poszukiwanego posetu.
