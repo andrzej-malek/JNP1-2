@@ -32,24 +32,35 @@ namespace jnp1 {
         std::unordered_map<id_poset, dictionary> &dictionary_map() {
             static std::unordered_map<id_poset, dictionary> *value = new std::unordered_map<id_poset, dictionary>;
             return *value;
-        };
+        }
+
+
         // Zmienna globalna przechowująca wartość identyfikatora dla następnego elementu danego posetu.
         std::unordered_map<id_poset, id_graph> &next_id_graph() {
             static std::unordered_map<id_poset, id_graph> *value = new std::unordered_map<id_poset, id_graph>;
             return *value;
-        };
+        }
+
+
         // Zmienna globalna przechowująca reprezentację grafową posetów.
         std::unordered_map<id_poset, graph> &graph_map() {
             static std::unordered_map<id_poset, graph> *value = new std::unordered_map<id_poset, graph>;
             return *value;
-        };
+        }
+
+
         // Zmienna globalna przechowująca transpozycje reprezentacji grafowej posetów.
         std::unordered_map<id_poset, graph> &transgraph_map() {
             static std::unordered_map<id_poset, graph> *value = new std::unordered_map<id_poset, graph>;
             return *value;
-        };
+        }
+
+
         // Zmienna globalna przechowująca wartość identyfikatora dla następnego posetu.
-        id_poset new_poset_id = 0;
+        id_poset new_poset_id() {
+            static id_poset value = 0;
+            return value++;
+        }
 
 
         /*      Funkcja badająca czy element value1 poprzedza element value2 w posecie o identyfikatorze id. Zakłada,
@@ -116,6 +127,14 @@ namespace jnp1 {
                     std::cerr << func_name + ": invalid value2 (NULL)\n";
                 }
                 return false;
+            } else if (dictionary_map().find(id) == dictionary_map().end()) {
+                if (debug) {
+                    std::string str_value1(value1);
+                    std::string str_value2(value2);
+                    std::cerr << func_name + "(" + std::to_string(id) + ", " + str_value1 + ", " + str_value2 + ")\n";
+                    std::cerr << func_name + ": poset " + std::to_string(id) + " does not exist\n";
+                }
+                return false;
             } else {
                 std::string str_value1(value1);
                 std::string str_value2(value2);
@@ -139,8 +158,7 @@ namespace jnp1 {
 
 
     unsigned long poset_new(void) {
-        id_poset added_poset = new_poset_id;
-        ++new_poset_id;
+        id_poset added_poset = new_poset_id();
         dictionary empty_dictionary;
         graph empty_graph;
         dictionary_map()[added_poset] = empty_dictionary;
@@ -148,7 +166,7 @@ namespace jnp1 {
         transgraph_map()[added_poset] = empty_graph;
         next_id_graph()[added_poset] = 0;
         if (debug) {
-            std::cerr << "poset_new: poset " + std::to_string(new_poset_id) + " created\n";
+            std::cerr << "poset_new: poset " + std::to_string(added_poset) + " created\n";
         }
         return added_poset;
     }
@@ -201,6 +219,12 @@ namespace jnp1 {
                     std::cerr << "poset_insert(" + std::to_string(id) + ", \"NULL\")\n"
                               << "poset_insert: invalid value (NULL)\n";
                 }
+            }
+            return false;
+        }
+        if (dictionary_map().find(id) == dictionary_map().end()) {
+            if (debug) {
+                std::cerr << "poset_insert: poset " + std::to_string(id) + " does not exist\n";
             }
             return false;
         }
