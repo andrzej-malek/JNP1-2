@@ -214,7 +214,7 @@ namespace jnp1 {
             }
             return 0;
         }
-        size_t result = graph_map()[id].size();
+        size_t result = dictionary_map()[id].size();
         if (debug) {
             std::cerr << "poset_size: poset " + std::to_string(id) + " contains " + std::to_string(result) +
                          " element(s)\n";
@@ -225,13 +225,15 @@ namespace jnp1 {
 
     bool poset_insert(id_poset id, char const *value) {
         if (value == NULL) {
-            if (debug && dictionary_map().find(id) == dictionary_map().end()) {
-                std::cerr << "poset_insert(" + std::to_string(id) + ", \"NULL\")\n"
-                     << "poset_insert: poset " + std::to_string(id) + " does not exist\n"
-                     << "poset_insert: invalid value (NULL)\n";
-            } else if (debug) {
-                std::cerr << "poset_insert(" + std::to_string(id) + ", \"NULL\")\n"
-                     << "poset_insert: invalid value (NULL)\n";
+            if (debug) {
+                if (dictionary_map().find(id) == dictionary_map().end()) {
+                    std::cerr << "poset_insert(" + std::to_string(id) + ", \"NULL\")\n"
+                              << "poset_insert: poset " + std::to_string(id) + " does not exist\n"
+                              << "poset_insert: invalid value (NULL)\n";
+                } else {
+                    std::cerr << "poset_insert(" + std::to_string(id) + ", \"NULL\")\n"
+                              << "poset_insert: invalid value (NULL)\n";
+                }
             }
             return false;
         }
@@ -281,6 +283,7 @@ namespace jnp1 {
                 std::cerr << "poset_remove: poset " + std::to_string(id) +
                     ", element \"" + str_value + "\" does not exist\n";
             }
+            result &= false;
         }
         if (!result) return false;
         id_graph node = dictionary_map()[id][str_value];
@@ -288,6 +291,8 @@ namespace jnp1 {
             (iter -> second).erase(node);
         }
         graph_map()[id].erase(node);
+        transgraph_map()[id].erase(node);
+        dictionary_map()[id].erase(str_value);
         if (debug) {
             std::cerr << "poset_remove: poset " + std::to_string(id) +
                          ", element \"" + str_value + "\" removed\n";
