@@ -222,15 +222,15 @@ namespace jnp1 {
             }
             return false;
         }
+        std::string str_value(value);
+        if (debug) {
+            std::cerr << "poset_insert(" + std::to_string(id) + ", \"" + str_value + "\")\n";
+        }
         if (dictionary_map().find(id) == dictionary_map().end()) {
             if (debug) {
                 std::cerr << "poset_insert: poset " + std::to_string(id) + " does not exist\n";
             }
             return false;
-        }
-        std::string str_value(value);
-        if (debug) {
-            std::cerr << "poset_insert(" + std::to_string(id) + ", \"" + str_value + "\")\n";
         }
         if (dictionary_map().find(id) == dictionary_map().end()) {
             if (debug) {
