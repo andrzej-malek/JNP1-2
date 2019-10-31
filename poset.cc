@@ -43,7 +43,7 @@ namespace jnp1 {
             static std::unordered_map<id_poset, graph> *value = new std::unordered_map<id_poset, graph>;
             return *value;
         };
-        // Zmienna globalna przechowująca reprezentację posetów.
+        // Zmienna globalna przechowująca transpozycje reprezentacji grafowej posetów.
         std::unordered_map<id_poset, graph> &transgraph_map() {
             static std::unordered_map<id_poset, graph> *value = new std::unordered_map<id_poset, graph>;
             return *value;
@@ -145,6 +145,7 @@ namespace jnp1 {
         graph empty_graph;
         dictionary_map()[added_poset] = empty_dictionary;
         graph_map()[added_poset] = empty_graph;
+        transgraph_map()[added_poset] = empty_graph;
         next_id_graph()[added_poset] = 0;
         if (debug) {
             std::cerr << "poset_new: poset " + std::to_string(new_poset_id) + " created\n";
@@ -161,6 +162,7 @@ namespace jnp1 {
             dictionary_map().erase(id);
             next_id_graph().erase(id);
             graph_map().erase(id);
+            transgraph_map().erase(id);
             if (debug) {
                 std::cerr << "poset_delete: poset " + std::to_string(id) + " deleted\n";
             }
@@ -366,14 +368,8 @@ namespace jnp1 {
 
     void poset_clear(id_poset id) {
         dictionary_map().erase(id);
-        next_id_graph().erase(id);
+        next_id_graph()[id] = 0;
         dictionary_map()[id].clear();
-        for (auto iter = graph_map()[id].begin(); iter != graph_map()[id].end(); ++iter) {
-            (iter -> second).clear();
-        }
-        for (auto iter = transgraph_map()[id].begin(); iter != transgraph_map()[id].end(); ++iter) {
-            (iter -> second).clear();
-        }
         graph_map()[id].clear();
         transgraph_map()[id].clear();
         if (debug) {
