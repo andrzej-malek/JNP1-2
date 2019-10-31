@@ -261,7 +261,11 @@ namespace jnp1 {
         graph g = graph_map()[id];
         if (value == NULL) {
             if (debug) {
-                std::cerr << "poset remove: invalid value (NULL)\n";
+                std::cerr << "poset_remove(" + std::to_string(id) + ", \"NULL\")\n";
+                if (dictionary_map().find(id) == dictionary_map().end()) {
+                    std::cerr << "poset_remove: poset " + std::to_string(id) + " does not exist\n";
+                }
+                std::cerr << "poset_insert: invalid value (NULL)\n";
             }
             result &= false;
         }
