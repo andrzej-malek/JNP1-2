@@ -50,7 +50,7 @@ namespace jnp1 {
          *  Parametry :
          *      id - Identyfikator poszukiwanego posetu.
          *  Return :
-         *      Liczba elementów posetu o podanym id jeżeli istnieje, lub 0 wpp.
+         *      Liczba elementów posetu o podanym id jeżeli istnieje, lub 0 w przeciwnym przypadku.
          */
         size_t poset_size(unsigned long id);
 

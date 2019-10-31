@@ -20,9 +20,10 @@ namespace jnp1 {
     // Typ identyfikatora elementów posetu.
     using id_graph = unsigned int;
     // Typ reprezentujący poset w postaci grafu skierowanego. Dla każdego elementu pod adresem jego identyfikatora
-    // znajduje się set z elementami, które poprzedza bezpośrednio w grafie.
+    // znajduje się set z elementami, które poprzedza bezpośrednio w grafie (lub które go poprzedzają dla
+    // transgraph_map).
     using graph = std::unordered_map<id_graph, std::unordered_set<id_graph>>;
-    // Typ słownika mapującego elementy posetu na ich identyfikatory
+    // Typ słownika mapującego elementy posetu na ich identyfikatory.
     using dictionary = std::unordered_map<std::string, id_graph>;
     // Typ identyfikatora posetu.
     using id_poset = unsigned long;
@@ -99,8 +100,7 @@ namespace jnp1 {
 
         /*      Funkcja badająca czy element value1 poprzedza element value2 w posecie o identyfikatorze id. Zakłada,
          *      że taki poset istnieje, i że elementy value1 i value2 do niego należą. Nie zakłada, że value1 nie jest
-         *      równe value2 (zwraca wartość true w takim przypadku). Pesymistyczna złożoność czasowa liniowa względem
-         *      liczby elementów posetu id.
+         *      równe value2 (zwraca wartość true w takim przypadku).
          *
          *  Parametry :
          *      id     : Identyfikator badanego posetu.
@@ -197,10 +197,12 @@ namespace jnp1 {
         id_poset added_poset = new_poset_id();
         dictionary empty_dictionary;
         graph empty_graph;
+
         dictionary_map()[added_poset] = empty_dictionary;
         graph_map()[added_poset] = empty_graph;
         transgraph_map()[added_poset] = empty_graph;
         next_id_graph()[added_poset] = 0;
+
         if (debug) {
             std::cerr << "poset_new: poset " + std::to_string(added_poset) + " created\n";
         }
@@ -352,11 +354,11 @@ namespace jnp1 {
         } else {
             id_graph value1_id = dictionary_map()[id][str_value1];
             id_graph value2_id = dictionary_map()[id][str_value2];
-            // el1 poprzedza el2 i vice versa
+            // el1 poprzedza el2 i el2 jest poprzedzany przez el1
             graph_map()[id][value1_id].insert(value2_id);
             transgraph_map()[id][value2_id].insert(value1_id);
             // el1 poprzedza wszystkie elementy poprzedzane przez el2 i
-            // el2 poprzedza wszystkie elementy poprzedzane przez el1
+            // el2 jest poprzedzany przez wszystkie elementy poprzedzające przez el1
             graph_map()[id][value1_id].insert(graph_map()[id][value2_id].begin(),
                                               graph_map()[id][value2_id].end());
             transgraph_map()[id][value2_id].insert(transgraph_map()[id][value1_id].begin(),
