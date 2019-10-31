@@ -360,7 +360,7 @@ namespace jnp1 {
             || graph_map()[id][node_val1].find(node_val2) == graph_map()[id][node_val1].end()) {
             if (debug) {
                 std::cerr << "poset_del: poset " + std::to_string(id)
-                             + " relation (\"" + str_value1 + "\", \"" + str_value2 + "\") cannot be deleted\n";
+                             + ", relation (\"" + str_value1 + "\", \"" + str_value2 + "\") cannot be deleted\n";
             }
             return false;
         }
@@ -370,7 +370,7 @@ namespace jnp1 {
             } else if (graph_map()[id][*iter].find(node_val2) != graph_map()[id][*iter].end()) {
                 if (debug) {
                     std::cerr << "poset_del: poset " + std::to_string(id)
-                                 + " relation (\"" + str_value1 + "\", \"" + str_value2 + "\") cannot be deleted\n";
+                                 + ", relation (\"" + str_value1 + "\", \"" + str_value2 + "\") cannot be deleted\n";
                 }
                 return false;
             }
@@ -379,7 +379,7 @@ namespace jnp1 {
         transgraph_map()[id][node_val2].erase(node_val1);
         if (debug) {
             std::cerr << "poset_del: poset " + std::to_string(id)
-                         + " relation (\"" + str_value1 + "\", \"" + str_value2 + "\") deleted\n";
+                         + ", relation (\"" + str_value1 + "\", \"" + str_value2 + "\") deleted\n";
         }
         return true;
     }
