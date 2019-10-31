@@ -258,20 +258,22 @@ namespace jnp1 {
 
     bool poset_remove(id_poset id, char const *value) {
         bool result = true;
+        std::string str_value;
         graph g = graph_map()[id];
         if (value == NULL) {
             if (debug) {
                 std::cerr << "poset remove: invalid value (NULL)\n";
             }
             result &= false;
+        } else {
+            str_value = value;
         }
-        std::string str_value(value);
         if (dictionary_map().find(id) == dictionary_map().end()) {
             if (debug) {
                 std::cerr << "poset_remove: poset " + std::to_string(id) + " does not exist\n";
             }
             result &= false;
-        } else if (dictionary_map()[id].find(str_value) == dictionary_map()[id].end()) {
+        } else if (result && dictionary_map()[id].find(str_value) == dictionary_map()[id].end()) {
             if (debug) {
                 std::cerr << "poset_remove: poset " + std::to_string(id) +
                     ", element \"" + str_value + "\" does not exist\n";
