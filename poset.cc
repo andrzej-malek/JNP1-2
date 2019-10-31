@@ -290,6 +290,9 @@ namespace jnp1 {
         for (auto iter = graph_map()[id].begin(); iter != graph_map()[id].end(); ++iter) {
             (iter -> second).erase(node);
         }
+        for (auto iter = transgraph_map()[id].begin(); iter != transgraph_map()[id].end(); ++iter) {
+            (iter -> second).erase(node);
+        }
         graph_map()[id].erase(node);
         transgraph_map()[id].erase(node);
         dictionary_map()[id].erase(str_value);
@@ -403,7 +406,11 @@ namespace jnp1 {
         for (auto iter = graph_map()[id].begin(); iter != graph_map()[id].end(); ++iter) {
             (iter -> second).clear();
         }
+        for (auto iter = transgraph_map()[id].begin(); iter != transgraph_map()[id].end(); ++iter) {
+            (iter -> second).clear();
+        }
         graph_map()[id].clear();
+        transgraph_map()[id].clear();
         if (debug) {
             std::cerr << "poset_clear: poset " + std::to_string(id) + " cleared\n";
         }
